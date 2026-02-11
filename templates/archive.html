@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Archive - SecureShare</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    <div class="side-menu" id="sideMenu">
+      <a href="/dashboard">My Files</a>
+      <a href="/share">Share</a>
+      <a href="/archive">Archive</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="topbar-center">Archive</div>
+
+  <div class="topbar-right">
+    <div class="profile-box" onclick="toggleProfile()">
+      <div class="profile-avatar">{{ username[0]|upper }}</div>
+      <div class="profile-name">{{ username }}</div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="left-panel">
+    <div class="files-box">
+      <h3>Archived Files</h3>
+      <ul id="archiveList" class="file-list">
+        <li>No archived files yet</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/modules/toast.js"></script>
+<script>
+  function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("open");
+  }
+  function toggleProfile() {
+    // Implementation later
+  }
+</script>
+</body>
+</html>

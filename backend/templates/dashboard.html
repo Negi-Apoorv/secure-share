@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h2>Welcome, {{ username }}</h2>
+<a href="/logout">Logout</a>
+
+<hr>
+
+<div class="container">
+
+  <!-- OPTIONS -->
+  <div class="card" style="width:20%">
+    <h3>Options</h3>
+    <button disabled>Upload File</button><br><br>
+    <button disabled>My Files</button><br><br>
+    <button disabled>Shared With Me</button>
+  </div>
+
+  <!-- MY FILES -->
+  <div class="card" style="width:50%">
+    <h3>Upload File</h3>
+
+    <input type="file" id="fileInput">
+    <button id="uploadBtn" onclick="uploadFile()">Upload</button>
+
+    <hr>
+
+    <h3>My Files</h3>
+    <ul id="fileList" class="file-list"></ul>
+  </div>
+
+  <!-- SHARED FILES -->
+  <div class="card" style="width:30%">
+    <h3>Shared With Me</h3>
+    <ul id="sharedFileList" class="file-list"></ul>
+  </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

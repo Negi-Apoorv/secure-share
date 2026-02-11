@@ -1,0 +1,18 @@
+# Flask
+SECRET_KEY=key//update
+FLASK_DEBUG=true
+FLASK_ENV=development
+
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=1234
+DB_NAME=secure_file_share
+
+# File Settings
+UPLOAD_DIR=storage/encrypted
+MAX_FILE_SIZE_MB=10
+
+# Encryption (Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))")
+FILE_ENCRYPTION_KEY=key//update

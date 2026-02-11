@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Share Files - SecureShare</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .file-selector {
+      margin-bottom: 20px;
+    }
+    .file-selector select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .selected-file {
+      background: #f0f8ff;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border: 1px solid #b8daff;
+    }
+    .selected-file strong {
+      color: #004085;
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    <div class="side-menu" id="sideMenu">
+      <a href="/dashboard">My Files</a>
+      <a href="/share">Share</a>
+      <a href="/archive">Archive</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="topbar-center">
+    {% if file_info %}
+      Share: {{ file_info.original_filename }}
+    {% else %}
+      Share Files
+    {% endif %}
+  </div>
+
+  <div class="topbar-right">
+    <div class="profile-box" onclick="toggleProfile()">
+      <div class="profile-avatar">{{ username[0]|upper }}</div>
+      <div class="profile-name">{{ username }}</div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="left-panel">
+    <div class="upload-box">
+      <h3>Share File</h3>
+      
+      <!-- Show selected file if coming from dashboard -->
+      {% if file_info %}
+      <div class="selected-file">
+        <strong>Selected File:</strong> {{ file_info.original_filename }}
+        <input type="hidden" id="selectedFileId" value="{{ file_info.id }}">
+        <br>
+        <small><a href="/share">Change file</a></small>
+      </div>
+      {% else %}
+      <!-- Show file selector if coming from menu -->
+      <div class="file-selector">
+        <label for="fileSelect">Select a file to share:</label>
+        <select id="fileSelect">
+          <option value="">-- Choose a file --</option>
+          {% for file in user_files %}
+          <option value="{{ file.id }}">{{ file.original_filename }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <!-- Username input -->
+      <div class="username-input">
+        <input id="shareUsername" placeholder="Username to share with">
+        <button onclick="submitShare()">Share</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="/static/js/modules/toast.js"></script>
+<script src="/static/js/modules/share.js"></script>
+<script>
+  function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("open");
+  }
+  
+  function toggleProfile() {
+    // Implementation later
+  }
+  
+  // Close menu when clicking outside
+  document.addEventListener('click', function(event) {
+    const sideMenu = document.getElementById('sideMenu');
+    const menuBtn = document.querySelector('.menu-btn');
+    
+    if (sideMenu && menuBtn && !sideMenu.contains(event.target) && !menuBtn.contains(event.target)) {
+      sideMenu.classList.remove('open');
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Files - SecureShare</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="menu-btn" id="menuBtn">☰</div>
+    <div class="side-menu" id="sideMenu">
+      <a href="/dashboard">My Files</a>
+      <a href="/share">Share</a>
+      <a href="/archive">Archive</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="topbar-center">My Files</div>
+
+  <div class="topbar-right">
+    <div class="icon bell" id="bellIcon"></div>
+    <div class="profile-box" id="profileBtn">
+      <div class="profile-avatar">{{ username[0]|upper }}</div>
+      <div class="profile-name">{{ username }}</div>
+    </div>
+    <div class="profile-menu" id="profileMenu">
+      <a href="/settings">Profile</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="left-panel">
+    <div class="upload-box">
+      <h3>Upload File</h3>
+      <input type="file" id="fileInput">
+      <button id="uploadButton">Upload</button>
+    </div>
+
+    <div class="files-box">
+      <h3>My Files</h3>
+      <ul id="fileList" class="file-list"></ul>
+    </div>
+  </section>
+
+  <section class="right-panel">
+    <h3>Shared With Me</h3>
+    <ul id="sharedList" class="file-list"></ul>
+  </section>
+</main>
+
+<script>
+  // Load core utilities first
+  window.showToast = function(message, type = "success") {
+    // Simple fallback if toast.js doesn't load
+    console.log(`[${type}]: ${message}`);
+    alert(message);
+  };
+</script>
+<script src="/static/js/modules/toast.js"></script>
+<script src="/static/js/modules/upload.js"></script>
+<script src="/static/js/modules/files.js"></script>
+<script>
+  // Direct event handlers - no waiting for DOMContentLoaded
+  document.addEventListener('click', function(event) {
+    // Menu toggle
+    if (event.target.id === 'menuBtn' || event.target.closest('#menuBtn')) {
+      const sideMenu = document.getElementById('sideMenu');
+      if (sideMenu) sideMenu.classList.toggle('open');
+    }
+    
+    // Profile toggle
+    if (event.target.id === 'profileBtn' || event.target.closest('#profileBtn')) {
+      const profileMenu = document.getElementById('profileMenu');
+      if (profileMenu) profileMenu.classList.toggle('open');
+    }
+    
+    // Upload button - use the window.uploadFile function
+    if (event.target.id === 'uploadButton' || event.target.closest('#uploadButton')) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      if (window.uploadFile && typeof window.uploadFile === 'function') {
+        window.uploadFile();
+      } else {
+        console.error('uploadFile function not available');
+        showToast('Please refresh the page or check console', 'error');
+      }
+    }
+  });
+  
+  // Load files when page is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof loadMyFiles === 'function') loadMyFiles();
+      if (typeof loadSharedFiles === 'function') loadSharedFiles();
+    });
+  } else {
+    // DOM already loaded
+    if (typeof loadMyFiles === 'function') loadMyFiles();
+    if (typeof loadSharedFiles === 'function') loadSharedFiles();
+  }
+  
+  // Close menus when clicking outside
+  document.addEventListener('click', function(event) {
+    const sideMenu = document.getElementById('sideMenu');
+    const menuBtn = document.getElementById('menuBtn');
+    const profileMenu = document.getElementById('profileMenu');
+    const profileBtn = document.getElementById('profileBtn');
+    
+    if (sideMenu && menuBtn && !sideMenu.contains(event.target) && !menuBtn.contains(event.target)) {
+      sideMenu.classList.remove('open');
+    }
+    
+    if (profileMenu && profileBtn && !profileMenu.contains(event.target) && !profileBtn.contains(event.target)) {
+      profileMenu.classList.remove('open');
+    }
+  });
+  async function archiveFile(fileId) {
+    if (!confirm("Are you sure you want to archive this file?")) {
+      return;
+    }
+    
+    try {
+      const res = await fetch("/file/archive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file_id: fileId })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast("File archived");
+        // Reload the file list
+        if (typeof loadMyFiles === 'function') {
+          loadMyFiles();
+        }
+      } else {
+        showToast(data.error || "Archive failed", "error");
+      }
+    } catch (err) {
+      console.error("Archive error:", err);
+      showToast("Network error", "error");
+    }
+  }
+  
+  // Make it globally available
+  window.archiveFile = archiveFile;
+</script>
+</body>
+</html>

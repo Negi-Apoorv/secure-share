@@ -149,18 +149,22 @@ body {
   background: #fff;
   border: 1px solid #ddd;
   padding: 12px;
+  max-height: 83vh;
 }
 
 .upload-box, .files-box {
   background: #fff;
   border: 1px solid #ddd;
   padding: 16px;
+  height: 40vh;
 }
 
 /* File List */
 .file-list {
   list-style: none;
   margin-top: 10px;
+  max-height: 90%;
+  overflow-x: auto;
 }
 
 .file-item {

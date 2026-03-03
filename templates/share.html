@@ -1,116 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Share Files - SecureShare</title>
-  <link rel="stylesheet" href="/static/css/style.css">
-  <style>
-    .file-selector {
-      margin-bottom: 20px;
-    }
-    .file-selector select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    .selected-file {
-      background: #f0f8ff;
-      padding: 12px;
-      border-radius: 4px;
-      margin-bottom: 20px;
-      border: 1px solid #b8daff;
-    }
-    .selected-file strong {
-      color: #004085;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Share Files - SecureShare</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* Share page specific styles */
+        .share-container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Left panel - 60% */
+        .left-panel-share {
+            flex: 6;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        /* Right panel - 40% split vertically */
+        .right-panel-share {
+            flex: 4;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .right-top, .right-bottom {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        /* Form styles */
+        .share-form {
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .file-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .file-select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
+        }
+
+        .selected-file-info {
+            background: #f0f8ff;
+            border: 1px solid #b8daff;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selected-file-info .file-icon {
+            width: 24px;
+            height: 24px;
+            background: #4a90e2;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .selected-file-info .file-details {
+            flex: 1;
+        }
+
+        .selected-file-info .file-name {
+            font-weight: 600;
+            color: #004085;
+        }
+
+        .selected-file-info .change-link {
+            color: #4a90e2;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .selected-file-info .change-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Username input with suggestions */
+        .username-input-container {
+            position: relative;
+        }
+
+        .username-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .username-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .suggestion-chip {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .suggestion-chip:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        /* Expiry options */
+        .expiry-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .expiry-option {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .expiry-option input[type="radio"] {
+            display: none;
+        }
+
+        .expiry-option label {
+            display: block;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .expiry-option input[type="radio"]:checked + label {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        /* Share button */
+        .share-btn {
+            width: 100%;
+            padding: 14px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .share-btn:hover {
+            background: #357abd;
+        }
+
+        .share-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Share lists */
+        .share-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .share-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .share-item:last-child {
+            border-bottom: none;
+        }
+
+        .share-item-icon {
+            width: 32px;
+            height: 32px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .share-item-details {
+            flex: 1;
+        }
+
+        .share-item-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .share-item-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .share-item-action {
+            color: #4a90e2;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .share-item-action:hover {
+            text-decoration: underline;
+        }
+
+        .empty-list {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            padding: 30px 0;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="menu-btn" onclick="toggleMenu()">☰</div>
+            <div class="side-menu" id="sideMenu">
+                <a href="/dashboard">My Files</a>
+                <a href="/share">Share</a>
+                <a href="/archive">Archive</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
 
-<header class="topbar">
-  <div class="topbar-left">
-    <div class="menu-btn" onclick="toggleMenu()">☰</div>
-    <div class="side-menu" id="sideMenu">
-      <a href="/dashboard">My Files</a>
-      <a href="/share">Share</a>
-      <a href="/archive">Archive</a>
-      <a href="/logout">Logout</a>
+        <div class="topbar-center">
+            Share Files
+        </div>
+
+        <div class="topbar-right">
+            <div class="profile-box" onclick="toggleProfile()">
+                <div class="profile-avatar">{{ username[0]|upper }}</div>
+                <div class="profile-name">{{ username }}</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="share-container">
+        <!-- Left Panel - Share Form (60%) -->
+        <div class="left-panel-share">
+            <h2 style="margin-bottom: 20px; color: #333;">Share a File</h2>
+            
+            <div class="share-form">
+                <!-- File Selection -->
+                <div class="form-group">
+                    <label>Select File</label>
+                    
+                    {% if file_info %}
+                    <!-- Pre-selected file from dashboard -->
+                    <div class="selected-file-info">
+                        <div class="file-icon">
+                            {{ file_info.original_filename.split('.')[-1].upper()[:3] }}
+                        </div>
+                        <div class="file-details">
+                            <div class="file-name">{{ file_info.original_filename }}</div>
+                        </div>
+                        <a href="/share" class="change-link">Change</a>
+                        <input type="hidden" id="selectedFileId" value="{{ file_info.id }}">
+                    </div>
+                    {% else %}
+                    <!-- File dropdown with recent files -->
+                    <select id="fileSelect" class="file-select">
+                        <option value="">-- Choose a recent file --</option>
+                        {% for file in user_files %}
+                        <option value="{{ file.id }}">
+                            {{ file.original_filename }} ({{ file.uploaded_at.strftime('%Y-%m-%d') }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% endif %}
+                </div>
+
+                <!-- Username Input with Suggestions Grid -->
+                <div class="form-group">
+                    <label>Share with Username</label>
+                    <div class="username-input-container">
+                        <input type="text" 
+                               id="shareUsername" 
+                               class="username-input" 
+                               placeholder="Enter username..."
+                               autocomplete="off">
+                        <div id="suggestionsGrid" class="suggestions-grid" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Expiry Options (Optional) -->
+                <div class="form-group">
+                    <label>Expiry (Optional)</label>
+                    <div class="expiry-options">
+                        <div class="expiry-option">
+                            <input type="radio" name="expiry" id="expiryNever" value="" checked>
+                            <label for="expiryNever">Never</label>
+                        </div>
+                        <div class="expiry-option">
+                            <input type="radio" name="expiry" id="expiry1d" value="1">
+                            <label for="expiry1d">1 Day</label>
+                        </div>
+                        <div class="expiry-option">
+                            <input type="radio" name="expiry" id="expiry7d" value="7">
+                            <label for="expiry7d">7 Days</label>
+                        </div>
+                        <div class="expiry-option">
+                            <input type="radio" name="expiry" id="expiry30d" value="30">
+                            <label for="expiry30d">30 Days</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Share Button -->
+                <button id="shareBtn" class="share-btn" onclick="submitShare()">Share File</button>
+            </div>
+        </div>
+
+        <!-- Right Panel - Split 50/50 -->
+        <div class="right-panel-share">
+            <!-- Top Right - Files Shared WITH Me -->
+            <div class="right-top">
+                <h3 style="margin-bottom: 15px; color: #333;">Files Shared With Me</h3>
+                <div id="sharedWithMe" class="share-list">
+                    <div class="empty-list">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Bottom Right - Recently Shared BY Me -->
+            <div class="right-bottom">
+                <h3 style="margin-bottom: 15px; color: #333;">Recently Shared By Me</h3>
+                <div id="recentlySharedByMe" class="share-list">
+                    <div class="empty-list">Loading...</div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="topbar-center">
-    {% if file_info %}
-      Share: {{ file_info.original_filename }}
-    {% else %}
-      Share Files
-    {% endif %}
-  </div>
+    <script src="/static/js/modules/toast.js"></script>
+    <script src="/static/js/modules/share.js"></script>
+    <script>
+        function toggleMenu() {
+            document.getElementById("sideMenu").classList.toggle("open");
+        }
+        
+        function toggleProfile() {
+            // Implementation later
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const sideMenu = document.getElementById('sideMenu');
+            const menuBtn = document.querySelector('.menu-btn');
+            
+            if (sideMenu && menuBtn && !sideMenu.contains(event.target) && !menuBtn.contains(event.target)) {
+                sideMenu.classList.remove('open');
+            }
+        });
 
-  <div class="topbar-right">
-    <div class="profile-box" onclick="toggleProfile()">
-      <div class="profile-avatar">{{ username[0]|upper }}</div>
-      <div class="profile-name">{{ username }}</div>
-    </div>
-  </div>
-</header>
-
-<main class="container">
-  <section class="left-panel">
-    <div class="upload-box">
-      <h3>Share File</h3>
-      
-      <!-- Show selected file if coming from dashboard -->
-      {% if file_info %}
-      <div class="selected-file">
-        <strong>Selected File:</strong> {{ file_info.original_filename }}
-        <input type="hidden" id="selectedFileId" value="{{ file_info.id }}">
-        <br>
-        <small><a href="/share">Change file</a></small>
-      </div>
-      {% else %}
-      <!-- Show file selector if coming from menu -->
-      <div class="file-selector">
-        <label for="fileSelect">Select a file to share:</label>
-        <select id="fileSelect">
-          <option value="">-- Choose a file --</option>
-          {% for file in user_files %}
-          <option value="{{ file.id }}">{{ file.original_filename }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      {% endif %}
-
-      <!-- Username input -->
-      <div class="username-input">
-        <input id="shareUsername" placeholder="Username to share with">
-        <button onclick="submitShare()">Share</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<script src="/static/js/modules/toast.js"></script>
-<script src="/static/js/modules/share.js"></script>
-<script>
-  function toggleMenu() {
-    document.getElementById("sideMenu").classList.toggle("open");
-  }
-  
-  function toggleProfile() {
-    // Implementation later
-  }
-  
-  // Close menu when clicking outside
-  document.addEventListener('click', function(event) {
-    const sideMenu = document.getElementById('sideMenu');
-    const menuBtn = document.querySelector('.menu-btn');
-    
-    if (sideMenu && menuBtn && !sideMenu.contains(event.target) && !menuBtn.contains(event.target)) {
-      sideMenu.classList.remove('open');
-    }
-  });
-</script>
+        // Load shares when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSharesWithMe();
+            loadRecentShares();
+        });
+    </script>
 </body>
 </html>
